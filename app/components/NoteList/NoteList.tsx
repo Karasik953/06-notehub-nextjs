@@ -20,7 +20,7 @@ export default function NoteList({ notes }: NoteListProps) {
           <div className={css.footer}>
             <span className={css.tag}>{note.tag}</span>
 
-            {/* 🔗 Додаємо лінк на сторінку деталей */}
+            {/* Посилання на деталі */}
             <Link href={`/notes/${note.id}`} className={css.viewLink}>
               View details
             </Link>

@@ -1,4 +1,3 @@
-// app/notes/Notes.client.tsx
 "use client";
 
 import { useState } from "react";
@@ -19,7 +18,6 @@ export default function NotesClient({ initialPage, initialSearch }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [debouncedSearch] = useDebounce(search, 300);
-
   const { data, isLoading, isError } = useFetchNotes(page, debouncedSearch);
 
   const handleSearchChange = (value: string) => {
@@ -52,6 +50,9 @@ export default function NotesClient({ initialPage, initialSearch }: Props) {
       {isError && <p>Something went wrong 😢</p>}
 
       {notes.length > 0 && <NoteList notes={notes} />}
+      {/* Для дебагу:
+      {!isLoading && !isError && <pre>{JSON.stringify(data, null, 2)}</pre>}
+      */}
 
       {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)}>
