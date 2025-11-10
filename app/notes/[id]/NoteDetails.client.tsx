@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "../../../lib/api";
-import css from "./NoteDetails.module.css"; // можеш зробити окремий файл стилів
+import css from "./NoteDetails.module.css";
 
 export default function NoteDetailsClient() {
   const params = useParams<{ id: string }>();
@@ -13,6 +13,7 @@ export default function NoteDetailsClient() {
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(String(id)),
     enabled: Boolean(id),
+    refetchOnMount: false, // ← додано за вимогою
   });
 
   if (isLoading) return <p>Loading, please wait...</p>;

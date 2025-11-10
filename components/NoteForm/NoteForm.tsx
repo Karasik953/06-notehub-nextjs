@@ -1,12 +1,13 @@
 // src/components/NoteForm/NoteForm.tsx
-import { Formik, Form, Field, ErrorMessage } from "formik"
-import * as Yup from "yup"
-import { useAddNote } from "../../hooks/useAddNote"
-import type { CreateNoteDto } from "../../types/note"
-import css from "./NoteForm.module.css"
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useAddNote } from "../../hooks/useAddNote";
+import { useQueryClient } from "@tanstack/react-query";           // ⬅️ додали
+import type { CreateNoteDto } from "../../types/note";
+import css from "./NoteForm.module.css";
 
 interface NoteFormProps {
-  onClose: () => void
+  onClose: () => void;
 }
 
 const schema = Yup.object().shape({
@@ -15,10 +16,11 @@ const schema = Yup.object().shape({
   tag: Yup.string()
     .oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"])
     .required("Required"),
-})
+});
 
 export default function NoteForm({ onClose }: NoteFormProps) {
-  const { mutateAsync, isPending } = useAddNote()
+  const { mutateAsync, isPending } = useAddNote();
+  const queryClient = useQueryClient();                           // ⬅️ додали
 
   return (
     <Formik<CreateNoteDto>
@@ -26,11 +28,13 @@ export default function NoteForm({ onClose }: NoteFormProps) {
       validationSchema={schema}
       onSubmit={async (values, { resetForm }) => {
         try {
-          await mutateAsync(values)   // <— без зайвих кастів
-          resetForm()
-          onClose()
+          await mutateAsync(values);
+          // ⬇️ КЛЮЧОВЕ: інвалідовуємо всі запити "notes" (будь-яка сторінка/пошук)
+          await queryClient.invalidateQueries({ queryKey: ["notes"] });
+          resetForm();
+          onClose();
         } catch {
-          // можете показати toast або помилку поруч з формою
+          // TODO: можна показати toast або текст помилки
         }
       }}
     >
@@ -44,13 +48,7 @@ export default function NoteForm({ onClose }: NoteFormProps) {
 
           <div className={css.formGroup}>
             <label htmlFor="content">Content</label>
-            <Field
-              as="textarea"
-              id="content"
-              name="content"
-              rows={8}
-              className={css.textarea}
-            />
+            <Field as="textarea" id="content" name="content" rows={8} className={css.textarea} />
             <ErrorMessage name="content" component="span" className={css.error} />
           </div>
 
@@ -67,24 +65,15 @@ export default function NoteForm({ onClose }: NoteFormProps) {
           </div>
 
           <div className={css.actions}>
-            <button
-              type="button"
-              className={css.cancelButton}
-              onClick={onClose}
-              disabled={isPending}
-            >
+            <button type="button" className={css.cancelButton} onClick={onClose} disabled={isPending}>
               Cancel
             </button>
-            <button
-              type="submit"
-              className={css.submitButton}
-              disabled={isPending}
-            >
+            <button type="submit" className={css.submitButton} disabled={isPending}>
               {isPending ? "Creating..." : "Create note"}
             </button>
           </div>
         </Form>
       )}
     </Formik>
-  )
+  );
 }

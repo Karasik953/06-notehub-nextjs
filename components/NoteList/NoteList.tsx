@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Note } from "../../types/note";
-import { useDeleteNote } from "../../hooks/useDeleteNote";
+import { useMutation, useQueryClient } from "@tanstack/react-query"; // ⬅️ додали
+import { deleteNote } from "../../services/noteService";              // ⬅️ додали
 import css from "./NoteList.module.css";
 
 interface NoteListProps {
@@ -8,7 +9,20 @@ interface NoteListProps {
 }
 
 export default function NoteList({ notes }: NoteListProps) {
-  const deleteNoteMutation = useDeleteNote();
+  const queryClient = useQueryClient();
+
+  // ⬇️ Мутація видалення прямо тут + інвалідовування кешу "notes"
+  const { mutate, isPending } = useMutation({
+    mutationFn: (id: string) => deleteNote(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+    // (опціонально) корисно мати базову обробку помилок
+    onError: () => {
+      // тут можна показати toast або повідомлення
+      // e.g. toast.error("Failed to delete note");
+    },
+  });
 
   return (
     <ul className={css.list}>
@@ -20,17 +34,17 @@ export default function NoteList({ notes }: NoteListProps) {
           <div className={css.footer}>
             <span className={css.tag}>{note.tag}</span>
 
-            {/* Посилання на деталі */}
             <Link href={`/notes/${note.id}`} className={css.viewLink}>
               View details
             </Link>
 
             <button
               className={css.button}
-              onClick={() => deleteNoteMutation.mutate(note.id)}
-              disabled={deleteNoteMutation.isPending}
+              onClick={() => mutate(note.id)}
+              disabled={isPending}
+              aria-disabled={isPending}
             >
-              {deleteNoteMutation.isPending ? "..." : "Delete"}
+              {isPending ? "..." : "Delete"}
             </button>
           </div>
         </li>

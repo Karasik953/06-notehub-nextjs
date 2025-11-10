@@ -1,17 +1,22 @@
+// app/notes/[id]/page.tsx
 import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query";
+// Якщо папка `lib` лежить поряд з `app` у корені проєкту:
 import { fetchNoteById } from "../../../lib/api";
+// Якщо твій NoteDetails.client.tsx лежить у app/notes/, піднімаємося на рівень вище:
 import NoteDetailsClient from "./NoteDetails.client";
 
-type Props = { params: { id: string } };
+// Вимога ментора: params як Promise і await
+type Params = Promise<{ id: string }>;
 
-export default async function NoteDetailsPage({ params }: Props) {
-  const { id } = params;
+export default async function NoteDetailsPage({
+  params,
+}: { params: Params }) {
+  const { id } = await params; // ← головна правка
 
   const qc = new QueryClient();
-  const queryKey = ["note", id];
 
   await qc.prefetchQuery({
-    queryKey,
+    queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
   });
 
