@@ -1,6 +1,6 @@
 // app/services/noteService.ts (або твій файл з axios)
 import axios from "axios";
-import type { Note, CreateNoteDto } from "../../types/note";
+import type { Note, CreateNoteDto } from "../types/note";
 
 export interface FetchNotesResponse {
   notes: Note[];
