@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
-import { useFetchNotes } from "../hooks/useFetchNotes";
-import NoteList from "../components/NoteList/NoteList";
-import Pagination from "../components/Pagination/Pagination";
-import SearchBox from "../components/SearchBox/SearchBox";
-import Modal from "../components/Modal/Modal";
-import NoteForm from "../components/NoteForm/NoteForm";
+import { useFetchNotes } from "../../hooks/useFetchNotes";
+import NoteList from "../../components/NoteList/NoteList";
+import Pagination from "../../components/Pagination/Pagination";
+import SearchBox from "../../components/SearchBox/SearchBox";
+import Modal from "../../components/Modal/Modal";
+import NoteForm from "../../components/NoteForm/NoteForm";
 import css from "./Notes.module.css";
 
 type Props = { initialPage: number; initialSearch: string };
